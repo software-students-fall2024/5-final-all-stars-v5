@@ -30,11 +30,17 @@ def create_app():
 
 @app.route("/")
 def home():
-    """
-    Return default web page
-    """
+    """Return default web page"""
     return render_template("index.html")
 
+@app.route("/history")
+def history():
+    """Return history web page"""
+    docs = db.History.find({})
+    log = []
+    for doc in docs:
+        log.append(doc)
+    return render_template("history.html", log = log)
 
 @app.route("/call_model", methods=["POST"])
 def call_model():
