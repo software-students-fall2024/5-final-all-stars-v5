@@ -14,3 +14,4 @@ pylint
 requests
 urllib3
 pymongo
+python-dotenv

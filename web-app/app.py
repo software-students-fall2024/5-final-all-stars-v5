@@ -3,11 +3,14 @@ Loads flask app for web-app
 """
 import os
 import logging
+from dotenv import load_dotenv
 import requests
 from flask import Flask, render_template, Blueprint, request, jsonify
 import pymongo
-connection = pymongo.MongoClient("mongodb+srv://sg6479:passWordGirl@cluster0.erh2p.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-db = connection["Project5"]
+load_dotenv()
+
+connection = pymongo.MongoClient(os.getenv('MONGO_CXN_STRING'))
+db = connection["history"]
 app = Blueprint("main", __name__)
 
 # logging for dev -- delete later
@@ -35,8 +38,8 @@ def home():
 
 @app.route("/history")
 def history():
-    """Return history web page"""
-    docs = db.History.find({})
+    """Returns history web page"""
+    docs = db.history.find({})
     log = []
     for doc in docs:
         log.append(doc)
@@ -54,7 +57,6 @@ def call_model():
 
         # Make a call to the /respond endpoint on port 5002
         ml_endpoint = ML_CLIENT_URL + "/respond"
-        
         response = requests.post(
             ml_endpoint,
             json={"user_input": user_input},  # Sending user input as JSON
@@ -68,7 +70,7 @@ def call_model():
                 "prompt": user_input,
                 "response": response.json()
             }
-            db.History.insert_one(doc)
+            db.history.insert_one(doc)
             return jsonify(response.json())  # Forward the successful response
         # Handle error responses from the /respond endpoint
         return (
