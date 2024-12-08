@@ -5,7 +5,9 @@ import os
 import logging
 import requests
 from flask import Flask, render_template, Blueprint, request, jsonify
-
+import pymongo
+connection = pymongo.MongoClient("mongodb+srv://sg6479:passWordGirl@cluster0.erh2p.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+db = connection["Project5"]
 app = Blueprint("main", __name__)
 
 # logging for dev -- delete later
@@ -55,6 +57,12 @@ def call_model():
 
         # Handle response from the /respond endpoint
         if response.status_code == 200:
+            # Saving prompt and response to database
+            doc = {
+                "prompt": user_input,
+                "response": response.json()
+            }
+            db.History.insert_one(doc)
             return jsonify(response.json())  # Forward the successful response
         # Handle error responses from the /respond endpoint
         return (
