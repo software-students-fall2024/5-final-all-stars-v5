@@ -15,7 +15,7 @@ connection = pymongo.MongoClient(os.getenv('MONGO_CXN_STRING'))
 db = connection["history"]
 
 load_dotenv()
-
+#
 app = Blueprint("main", __name__)
 
 logging.basicConfig(
