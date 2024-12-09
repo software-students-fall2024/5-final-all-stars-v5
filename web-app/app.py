@@ -1,6 +1,7 @@
 """
 Loads flask app for web-app
 """
+from datetime import datetime
 import os
 import logging
 from dotenv import load_dotenv
@@ -56,53 +57,75 @@ def call_model():
     """
     Post request saves user input and posts it to ml-client to await response
     """
-
     try:
         # Extract user input
-        logging.info("ML_CLIENT_URL: %s", ML_CLIENT_URL)  # Add this line
+        logging.info("ML_CLIENT_URL: %s", ML_CLIENT_URL)
 
         user_input = request.form["user_input"]
 
-        if not user_input:  # Check if user_input is None or empty
+        if not user_input:
             logging.error("No user input received.")
             return jsonify({"response": "User input is required"}), 400
 
         logging.info("Input received: %s", user_input)
 
-        # Make a call to the /respond endpoint on port 5002
+        # Make a call to the /respond endpoint
         ml_endpoint = ML_CLIENT_URL + "/respond"
+        logging.info("Attempting to connect to ML endpoint: %s", ml_endpoint)
 
-        logging.info(ml_endpoint)
-        
+        try:
+            response = requests.post(
+                ml_endpoint,
+                json={"user_input": user_input},
+                timeout=15,
+            )
+            
+            # Log the response details
+            logging.info("Response status code: %s", response.status_code)
+            logging.info("Response headers: %s", response.headers)
+            
+            try:
+                response_json = response.json()
+                logging.info("Response JSON: %s", response_json)
+            except ValueError:
+                logging.error("Response not JSON: %s", response.text)
+                return jsonify({"response": "Invalid response from ML client"}), 500
 
-        response = requests.post(
-            ml_endpoint,
-            json={"user_input": user_input},  # Sending user input as JSON
-            timeout=15,
-        )
+            if response.status_code == 200:
+                # Saving prompt and response to database
+                try:
+                    doc = {
+                        "Prompt": user_input,
+                        "Response": response_json,
+                        "timestamp": datetime.utcnow()
+                    }
+                    db.history.insert_one(doc)
+                except Exception as db_error:
+                    logging.error("Database error: %s", db_error)
+                    # Continue even if DB save fails
+                
+                return jsonify(response_json)
+            
+            error_msg = f"ML client returned {response.status_code}: {response.text}"
+            logging.error(error_msg)
+            return jsonify({"response": error_msg}), response.status_code
 
-        # Handle response from the /respond endpoint
-        if response.status_code == 200:
-            # Saving prompt and response to database
-            doc = {
-                "Prompt": user_input,
-                "Response": response.json()
-            }
-            db.history.insert_one(doc)
-            return jsonify(response.json())  # Forward the successful response
-        # Handle error responses from the /respond endpoint
-        return (
-            jsonify({"response": f"Failed to call /respond: {response.text}"}),
-            response.status_code,
-        )
-    # NewConnectionError
-    except requests.exceptions.ConnectionError as e:
-        logging.error("error in /call_model: %s", e)
-        return jsonify({"response": "Error connecting to ml-client"}), 500
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        # logging.error("Error in /call_model: %s", e)
-        return jsonify({"response": str(e)}), 500
+        except requests.exceptions.Timeout:
+            error_msg = "ML client request timed out after 15 seconds"
+            logging.error(error_msg)
+            return jsonify({"response": error_msg}), 504
 
+        except requests.exceptions.ConnectionError as e:
+            error_msg = f"Could not connect to ML client: {str(e)}"
+            logging.error(error_msg)
+            return jsonify({
+                "response": "ML service is unavailable. Please check if the model is properly loaded."
+            }), 503
+
+    except Exception as e:
+        error_msg = f"Unexpected error in call_model: {str(e)}"
+        logging.error(error_msg, exc_info=True)
+        return jsonify({"response": "An unexpected error occurred"}), 500
 
 if __name__ == "__main__":
     app = create_app()
