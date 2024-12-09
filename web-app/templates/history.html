@@ -21,9 +21,20 @@
             color: #fff;
             margin: 0;
             }
+        
+        p {
+            margin-top: 25px;
+            margin-left: 25px;
+        }
     </style>
 </head>
 <body>
     <h1>History</h1>
-   {{log}}
+    <p>
+    Previous questions and responses: <br />
+    <br />
+    {% for x in log %}
+    {{x}} <br /> <br />
+    {% endfor %}
+    </p>
 </body>

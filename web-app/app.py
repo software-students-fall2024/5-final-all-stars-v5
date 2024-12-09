@@ -42,7 +42,10 @@ def history():
     docs = db.history.find({})
     log = []
     for doc in docs:
-        log.append(doc)
+        prompt = doc["Prompt"]
+        response = doc["Response"]
+        response = response["response"]
+        log.append({prompt: response})
     return render_template("history.html", log = log)
 
 @app.route("/call_model", methods=["POST"])
@@ -67,8 +70,8 @@ def call_model():
         if response.status_code == 200:
             # Saving prompt and response to database
             doc = {
-                "prompt": user_input,
-                "response": response.json()
+                "Prompt": user_input,
+                "Response": response.json()
             }
             db.history.insert_one(doc)
             return jsonify(response.json())  # Forward the successful response
