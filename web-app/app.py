@@ -24,7 +24,8 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()],
 )
 
-ML_CLIENT_URL = os.getenv('ML_CLIENT_PORT')
+# ML_CLIENT_URL = os.getenv('ML_CLIENT_PORT')
+ML_CLIENT_URL = "http://localhost:5002"
 
 def create_app():
     """

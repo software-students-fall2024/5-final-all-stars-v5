@@ -20,8 +20,8 @@ suppress_llama_cpp_logging()
 
 # Initialize the LLM globally
 # Ministral-8B-Instruct-2410-Q4_K_M.gguf ./models/Mistral-7B-v0.1.Q3_K_S.gguf
-# MODEL_PATH = "./models/SmolLM-135M.Q2_K.gguf"
 MODEL_PATH = "./models/Ministral-8B-Instruct-2410-Q4_K_M.gguf"
+MODEL_PATH = "./models/SmolLM-135M.Q2_K.gguf"
 DEFAULT_TEMPERATURE = 0.1
 
 loader = Loader("Initializing large language model...")
@@ -46,7 +46,7 @@ def handle_user_input():
     Handles POST requests to process user input and return a response.
 
     Example Use Case:
-    curl -X POST http://127.0.0.1:5000/respond \
+    curl -X POST http://localhost:5002/respond \
     -H "Content-Type: application/json" \
     -d '{"user_input": "What is the capital of France?"}'
     """
