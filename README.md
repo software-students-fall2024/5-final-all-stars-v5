@@ -6,7 +6,7 @@
 
 ## Description
 
-Replace here with description
+This project is a miniature chatbot app. It utilizes an LLM to produce responses for the user. The app also has a history feature, which shows previous prompts and responses.
 
 ## DockerHub Container Images
 
@@ -22,13 +22,18 @@ Replace here with description
 
 ## Configuration Instructions
 
-Replace with configuration instructions...
+- Use Docker Locally
+    1. If you haven't already, install the `Docker Desktop`.
+    2. Make sure Docker daemon is running.
+    3. Go to the main directory of the project and run `docker compose up --build` in the terminal.
+    4. Enter the local address where the `web-app` container is running. This should be configured to port 5001.
 
 ## Environment Setup
 
 To run this project locally, you will need a `.env` file (at the same directory level as this README) with the following format (dummy-data):
 
 ```
+MONGO_CXN_STRING=vvv
 MONGO_USERNAME=www
 MONGO_PASSWORD=xxx
 DOCKERHUB_USERNAME=yyy
