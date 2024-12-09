@@ -3,9 +3,15 @@ Loads flask app for web-app
 """
 import os
 import logging
+from dotenv import load_dotenv
 import requests
 from dotenv import load_dotenv
 from flask import Flask, render_template, Blueprint, request, jsonify
+import pymongo
+load_dotenv()
+
+connection = pymongo.MongoClient(os.getenv('MONGO_CXN_STRING'))
+db = connection["history"]
 
 load_dotenv()
 
@@ -30,11 +36,20 @@ def create_app():
 
 @app.route("/")
 def home():
-    """
-    Return default web page
-    """
+    """Return default web page"""
     return render_template("index.html")
 
+@app.route("/history")
+def history():
+    """Returns history web page"""
+    docs = db.history.find({})
+    log = []
+    for doc in docs:
+        prompt = doc["Prompt"]
+        response = doc["Response"]
+        response = response["response"]
+        log.append({prompt: response})
+    return render_template("history.html", log = log)
 
 @app.route("/call_model", methods=["POST"])
 def call_model():
@@ -56,8 +71,10 @@ def call_model():
 
         # Make a call to the /respond endpoint on port 5002
         ml_endpoint = ML_CLIENT_URL + "/respond"
+
         logging.info(ml_endpoint)
         
+
         response = requests.post(
             ml_endpoint,
             json={"user_input": user_input},  # Sending user input as JSON
@@ -66,6 +83,12 @@ def call_model():
 
         # Handle response from the /respond endpoint
         if response.status_code == 200:
+            # Saving prompt and response to database
+            doc = {
+                "Prompt": user_input,
+                "Response": response.json()
+            }
+            db.history.insert_one(doc)
             return jsonify(response.json())  # Forward the successful response
         # Handle error responses from the /respond endpoint
         return (
