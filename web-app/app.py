@@ -5,15 +5,18 @@ import os
 import logging
 from dotenv import load_dotenv
 import requests
+from dotenv import load_dotenv
 from flask import Flask, render_template, Blueprint, request, jsonify
 import pymongo
 load_dotenv()
 
 connection = pymongo.MongoClient(os.getenv('MONGO_CXN_STRING'))
 db = connection["history"]
+
+load_dotenv()
+
 app = Blueprint("main", __name__)
 
-# logging for dev -- delete later
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -53,13 +56,25 @@ def call_model():
     """
     Post request saves user input and posts it to ml-client to await response
     """
+
     try:
         # Extract user input
+        logging.info("ML_CLIENT_URL: %s", ML_CLIENT_URL)  # Add this line
+
         user_input = request.form["user_input"]
+
+        if not user_input:  # Check if user_input is None or empty
+            logging.error("No user input received.")
+            return jsonify({"response": "User input is required"}), 400
+
         logging.info("Input received: %s", user_input)
 
         # Make a call to the /respond endpoint on port 5002
         ml_endpoint = ML_CLIENT_URL + "/respond"
+
+        logging.info(ml_endpoint)
+        
+
         response = requests.post(
             ml_endpoint,
             json={"user_input": user_input},  # Sending user input as JSON
@@ -83,7 +98,7 @@ def call_model():
     # NewConnectionError
     except requests.exceptions.ConnectionError as e:
         logging.error("error in /call_model: %s", e)
-        return jsonify({"response": "Error connecting to ml-client"})
+        return jsonify({"response": "Error connecting to ml-client"}), 500
     except Exception as e:  # pylint: disable=broad-exception-caught
         # logging.error("Error in /call_model: %s", e)
         return jsonify({"response": str(e)}), 500

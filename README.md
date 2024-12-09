@@ -1,6 +1,8 @@
-put badge here
+![Web-App CI Workflow](https://github.com/software-students-fall2024/5-final-all-stars-v5/actions/workflows/web-app.yml/badge.svg)
+![ML-Client CI Workflow](https://github.com/software-students-fall2024/5-final-all-stars-v5/actions/workflows/ml-client.yml/badge.svg)
+![Deployment Workflow](https://github.com/software-students-fall2024/5-final-all-stars-v5/actions/workflows/deploy.yml/badge.svg)
 
-# Final Project - (Replace here with title)
+# Containerized Mini-Chatbot App
 
 ## Description
 
@@ -8,9 +10,8 @@ Replace here with description
 
 ## DockerHub Container Images
 
-- [image1](https://hub.docker.com/)
-- [image2](https://hub.docker.com/)
-replace these with correct links
+- [Web-App Dockerhub container image](https://hub.docker.com/repository/docker/ipompliano/web-app/general)
+- [ML-Client Dockerhub container image](https://hub.docker.com/repository/docker/ipompliano/ml-client/general)
 
 ## Team Members
 
@@ -25,10 +26,11 @@ Replace with configuration instructions...
 
 ## Environment Setup
 
-Replace with environment setup instructions. Inlude a sample `.env` file with dummy data:
+To run this project locally, you will need a `.env` file (at the same directory level as this README) with the following format (dummy-data):
 
 ```
-key1=xxx
-key2=yyy
-key3=zzz
+MONGO_USERNAME=www
+MONGO_PASSWORD=xxx
+DOCKERHUB_USERNAME=yyy
+ML_CLIENT_PORT=zzz
 ```

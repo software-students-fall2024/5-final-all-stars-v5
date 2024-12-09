@@ -2,7 +2,7 @@
 Loads flask app for ml-client
 """
 
-from flask import Flask, request, jsonify, render_template, Blueprint
+from flask import Flask, request, jsonify, Blueprint
 from helpers.respond import (
     initialize_llm,
     suppress_llama_cpp_logging,
@@ -21,7 +21,7 @@ suppress_llama_cpp_logging()
 # Initialize the LLM globally
 # Ministral-8B-Instruct-2410-Q4_K_M.gguf ./models/Mistral-7B-v0.1.Q3_K_S.gguf
 MODEL_PATH = "./models/Ministral-8B-Instruct-2410-Q4_K_M.gguf"
-MODEL_PATH = "./models/SmolLM-135M.Q2_K.gguf"
+# MODEL_PATH = "./models/SmolLM-135M.Q2_K.gguf"
 DEFAULT_TEMPERATURE = 0.1
 
 loader = Loader("Initializing large language model...")
@@ -30,7 +30,7 @@ loader.start()  # Start the loading spinner
 try:
     llm = initialize_llm(MODEL_PATH, DEFAULT_TEMPERATURE)
 finally:
-    loader.stop()  # Stop the loading spinner when the task completes
+    loader.stop()
 
 def create_app():
     """
@@ -39,14 +39,6 @@ def create_app():
     test_app = Flask(__name__)
     test_app.register_blueprint(app)
     return test_app
-
-@app.route("/")
-def index():
-    """
-    Renders the main page of the application.
-    """
-    return render_template("index.html")
-
 
 @app.route("/respond", methods=["POST"])
 def handle_user_input():
