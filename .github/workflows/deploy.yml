@@ -33,8 +33,6 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "web-app/,ml-client/"
-          target: "~/app/"
           script: |
             mkdir -p ~/app
             cd ~/app
