@@ -58,8 +58,6 @@ def call_model():
     Post request saves user input and posts it to ml-client to await response
     """
     try:
-        # Extract user input
-        logging.info("ML_CLIENT_URL: %s", ML_CLIENT_URL)
 
         user_input = request.form["user_input"]
 
@@ -69,9 +67,7 @@ def call_model():
 
         logging.info("Input received: %s", user_input)
 
-        # Make a call to the /respond endpoint
         ml_endpoint = ML_CLIENT_URL + "/respond"
-        logging.info("Attempting to connect to ML endpoint: %s", ml_endpoint)
 
         try:
             response = requests.post(
@@ -79,11 +75,7 @@ def call_model():
                 json={"user_input": user_input},
                 timeout=15,
             )
-            
-            # Log the response details
-            logging.info("Response status code: %s", response.status_code)
-            logging.info("Response headers: %s", response.headers)
-            
+                        
             try:
                 response_json = response.json()
                 logging.info("Response JSON: %s", response_json)

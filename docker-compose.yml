@@ -1,6 +1,6 @@
 services:
   web-app:
-    image: ${DOCKERHUB_USERNAME}/web-app:latest
+    build: ./web-app
     ports:
       - "5001:5001"
     env_file:
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   ml-client:
-    image: ${DOCKERHUB_USERNAME}/ml-client:latest
+    build: ./ml_client
     ports:
       - "5002:5002"
     restart: unless-stopped
@@ -26,7 +26,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-
     command: mongod --quiet --logpath /dev/null
     volumes:
       - mongodb_data:/data/db
