@@ -17,7 +17,6 @@ LOG_CALLBACK = None
 # Suppress llama cpp logging
 suppress_llama_cpp_logging()
 
-#
 # Initialize the LLM globally
 # Ministral-8B-Instruct-2410-Q4_K_M.gguf ./models/Mistral-7B-v0.1.Q3_K_S.gguf
 MODEL_PATH = "./models/Ministral-8B-Instruct-2410-Q4_K_M.gguf"
